@@ -16,9 +16,6 @@ public:
   int id;
   long long finish_time;
 
-  bool isFree(long long time) {
-    return time >= finish_time;
-  }
   void debug() {
     cout << "id:" << id <<" t:" << finish_time << std::endl;
   }
@@ -73,7 +70,7 @@ public:
   WorkersQueue(int s) {
    size = s; 
    for(int i = 0 ; i < s; ++i) {
-    insert(Worker(i, -1));
+    insert(Worker(i, 0));
    }
  }
 
@@ -81,9 +78,9 @@ public:
   return heap[0];
  }
 
- void apply(int job, long long cloak) {
+ void apply(int job) {
   Worker w = get();
-  w.finish_time = cloak + job;
+  w.finish_time += job;
   heap[0] = w;
   siftDown(0);
  }
@@ -121,17 +118,11 @@ class JobQueue {
     int completed = 0;
     WorkersQueue q = WorkersQueue(num_workers_);
     while(completed < jobs_.size()) {
-
       Worker w = q.get();
-      if(w.isFree(cloak)) {
-        assigned_workers_.push_back(w.id);
-        start_times_.push_back(cloak);
-        q.apply(jobs_[completed], cloak);
-        ++completed;
-      }
-      if(q.get().isFree(cloak) && completed < jobs_.size()) { continue;}
-
-      ++cloak;
+      assigned_workers_.push_back(w.id);
+      start_times_.push_back(w.finish_time);
+      q.apply(jobs_[completed]);
+      ++completed;
     }
   }
 
