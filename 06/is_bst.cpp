@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <iostream>
 #include <vector>
+#include <limits.h>
 
 
 using std::cin;
@@ -50,18 +51,21 @@ result check(const vector<Node>& tree, int node) {
   return {true, r};
 }
 
+bool is_bst(const vector<Node>& tree, int node, int min, int max) {
+  // cout << "node: " << node << " key: " << tree[node].key << " min: " << min << " max: " << max << endl;
+  if(node == -1) {return true;}
+  if(tree[node].key < min || tree[node].key > max ) {
+    return false;
+  }
+
+  return (is_bst(tree, tree[node].left, min, tree[node].key-1) &&
+              is_bst(tree, tree[node].right, tree[node].key+1, max));
+}
+
 bool IsBinarySearchTree(const vector<Node>& tree) {
   if(tree.size() < 1) {return true;}
-  try {
-    return check(tree, 0).first;
-  }
-  catch(std::exception& e) {
-    cout << tree.size() << endl;
-    for(auto n : tree) {
-      cout << n.key << " " << n.left << " " << n.right << endl;
-    }
-  }
-  return true;
+
+  return is_bst(tree, 0, INT_MIN, INT_MAX);
 }
 
 int main() {
